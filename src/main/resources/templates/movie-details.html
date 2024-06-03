@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Detalji o filmu</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" th:href="@{/images/icon.png}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+         #myImg {
+             margin-bottom: 5px;
+             border-radius: 5px;
+             cursor: pointer;
+             transition: 0.3s;
+         }
+
+        #myImg:hover {opacity: 0.7;}
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        #caption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+            height: 150px;
+        }
+        .modal-content, #caption {
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+
+        @keyframes zoom {
+            from {transform: scale(0.1)}
+            to {transform: scale(1)}
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @media only screen and (max-width: 700px){
+            .modal-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <img class="navbar-brand" th:src="@{/images/logo.png}" style="height: 50px" alt="Logo"/>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#myNavbar" aria-controls="myNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/">Početna</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/movies">Lista filmova</a>
+                </li>
+                <li class="nav-item" th:if="${currentUsername == true}">
+                    <a class="btn btn-success m-1" href="/movies/add"><span class="bi bi-plus"></span> Dodaj film</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item" th:if="${currentUsername == false}">
+                    <a class="btn btn-light m-1" href="/auth/login"><span class="bi bi-box-arrow-in-right"></span> Prijavi se</a>
+                </li>
+                <li class="nav-item" th:if="${currentUsername == false}">
+                    <a class="btn btn-info m-1" href="/auth/register"><span class="bi bi-person-plus"></span> Registriraj se</a>
+                </li>
+                <li class="nav-item" th:if="${currentUsername == true}">
+                    <a class="btn btn-danger m-1" href="/auth/logout"><span class="bi bi-box-arrow-right"></span> Odjavi se</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div style="height: 70vh; position: relative;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.50) 65%, rgba(255,255,255,0) 100%);"></div>
+        <img th:src="${movie.getPosterPath()}" style="height: 100%; width: 100%; object-position: 50% 50%; object-fit: cover;" alt="Cover slika">
+    </div>
+
+    <div class="bg-black text-center">
+    <div class="mb-5">
+        <h1 th:text="${movie.getTitle()}" style="color: #fff; font-size: 32px; font-weight: bold; text-space: 1.5"></h1>
+        <span th:text="${movie.getGenres()}" style="color: #fff; font-size: 24px; font-style: italic"></span>
+    </div>
+
+        <div class="row" th:object="${movie}">
+            <div class="col-md-4 p-4">
+                <img id="myImg" th:src="${movie.getPosterPath()}" style="width: 100%; border: 2px #fff solid; border-radius: 10px; margin: 3px" th:alt="${movie.getTitle()}">
+                <input type="text" th:field="*{posterPath}" class="form-control"/>
+                <div th:if="${#fields.hasErrors('posterPath')}" class="alert alert-danger" role="alert">
+                    <span th:errors="*{posterPath}"></span>
+                </div>
+            </div>
+            <div class="col-md-8 p-4" >
+                <form th:action="@{/movies/update/{id}(id=${movie.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" th:field="*{posterPath}" class="form-control"/>
+                    <table class="table table-bordered table-striped" style="border-radius: 10px; overflow: hidden">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Naslov filma:</th>
+                            <td><input type="text" th:field="*{title}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('title')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{title}"></span>
+                                </div></td>
+                        <tr>
+                            <th scope="row">Prosječna ocena:</th>
+                            <td><input type="text" th:field="*{voteAverage}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('voteAverage')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{voteAverage}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Status:</th>
+                            <td><input type="text" th:field="*{status}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('status')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{status}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Datum izlaska:</th>
+                            <td><input type="date" th:field="*{releaseDate}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('releaseDate')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{releaseDate}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Prihod:</th>
+                            <td><input type="text" th:field="*{revenue}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('revenue')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{revenue}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Trajanje:</th>
+                            <td><input type="text" th:field="*{runtime}" class="form-control"/> <span>min</span>
+                                <div th:if="${#fields.hasErrors('runtime')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{runtime}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Budžet:</th>
+                            <td><input type="text" th:field="*{budget}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('budget')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{budget}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Žanrovi:</th>
+                            <td><input type="text" th:field="*{genres}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('genres')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{genres}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Produkcijske kompanije:</th>
+                            <td><input type="text" th:field="*{productionCompanies}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('productionCompanies')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{productionCompanies}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Zemlje proizvodnje:</th>
+                            <td><input type="text" th:field="*{productionCountries}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('productionCountries')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{productionCountries}"></span>
+                                </div></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Web stranica:</th>
+                            <td><input type="text" th:field="*{homepage}" class="form-control"/>
+                                <div th:if="${#fields.hasErrors('homepage')}" class="alert alert-danger" role="alert">
+                                    <span th:errors="*{homepage}"></span>
+                                </div></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Spremi</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer class="container-fluid text-center mt-2 bg-light">
+    <p>© 2024 FPMOZ, Mateo Žulj</p>
+</footer>
+
+
+<div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="img01">
+    <div id="caption"></div>
+</div>
+
+<script>
+    var modal = document.getElementById('myModal');
+
+    var img = document.getElementById('myImg');
+    var modalImg = document.getElementById("img01");
+    var captionText = document.getElementById("caption");
+    img.onclick = function(){
+        modal.style.display = "block";
+        modalImg.src = this.src;
+        captionText.innerHTML = this.alt;
+    }
+
+    var span = document.getElementsByClassName("close")[0];
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+
+</body>
+</html>

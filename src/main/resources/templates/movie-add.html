@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dodaj novi film</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" th:href="@{/images/icon.png}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url(/images/bg-pattern.jpg);
+            background-size: 175px 175px;
+            background-repeat: repeat;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper-bg">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <img class="navbar-brand" th:src="@{/images/logo.png}" style="height: 50px" alt="Logo"/>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#myNavbar" aria-controls="myNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/">Početna</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/movies">Lista filmova</a>
+                </li>
+                <li class="nav-item" th:if="${currentUsername == true}">
+                    <a class="btn btn-success m-1" href="/movies/add"><span class="bi bi-plus"></span> Dodaj film</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item" th:if="${currentUsername == false}">
+                    <a class="btn btn-light m-1" href="/auth/login"><span class="bi bi-box-arrow-in-right"></span> Prijavi se</a>
+                </li>
+                <li class="nav-item" th:if="${currentUsername == false}">
+                    <a class="btn btn-info m-1" href="/auth/register"><span class="bi bi-person-plus"></span> Registriraj se</a>
+                </li>
+                <li class="nav-item" th:if="${currentUsername == true}">
+                    <a class="btn btn-danger m-1" href="/auth/logout"><span class="bi bi-box-arrow-right"></span> Odjavi se</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<br>
+<div class="container mb-3">
+    <div class="form-container bg-light rounded-3 m-3 p-3">
+        <h2 class="form-header text-center m-3">Dodaj novi film</h2>
+        <form class="p-3" action="/movies/add-movie" method="post" th:object="${movie}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="title" class="form-label">Naslov filma</label>
+                    <input type="text" class="form-control" id="title" name="title" required th:field="*{title}" maxlength="200">
+                    <div th:if="${#fields.hasErrors('title')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{title}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="voteAverage" class="form-label">Ocijena filma</label>
+                    <input type="number" class="form-control" id="voteAverage" name="voteAverage" th:field="*{voteAverage}" min="1" max="10" step="0.01">
+                    <div th:if="${#fields.hasErrors('voteAverage')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{voteAverage}"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="status" class="form-label">Status</label>
+                    <input type="text" class="form-control" id="status" name="status" th:field="*{status}" required>
+                    <div th:if="${#fields.hasErrors('status')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{status}"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="releaseDate" class="form-label">Status</label>
+                    <input type="date" class="form-control" id="releaseDate" name="status" th:field="*{releaseDate}" required>
+                    <div th:if="${#fields.hasErrors('releaseDate')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{releaseDate}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="revenue" class="form-label">Prihod</label>
+                    <input type="number" class="form-control" id="revenue" name="revenue" th:field="*{revenue}" min="0">
+                    <div th:if="${#fields.hasErrors('revenue')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{revenue}"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="budget" class="form-label">Budžet</label>
+                    <input type="number" class="form-control" id="budget" name="budget" th:field="*{budget}" min="0">
+                    <div th:if="${#fields.hasErrors('budget')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{budget}"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="runtime" class="form-label">Trajanje</label>
+                    <input type="number" class="form-control" id="runtime" name="runtime" th:field="*{runtime}" min="0">
+                    <div th:if="${#fields.hasErrors('runtime')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{runtime}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="overview" class="form-label">Sadržaj</label>
+                    <textarea class="form-control" id="overview" name="overview" rows="3" th:field="*{overview}" required></textarea>
+                    <div th:if="${#fields.hasErrors('overview')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{overview}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="homepage" class="form-label">Početna stranica</label>
+                    <input type="url" class="form-control" id="homepage" name="homepage" th:field="*{homepage}">
+                    <div class="form-text">Unesite valjanu URL adresu slike.</div>
+                    <div th:if="${#fields.hasErrors('homepage')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{homepage}"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="posterPath" class="form-label">Putanja do postera</label>
+                    <input type="text" class="form-control" id="posterPath" name="posterPath" th:field="*{posterPath}" pattern="https?://.+">
+                    <div class="form-text">Unesite valjanu URL adresu slike.</div>
+                    <div th:if="${#fields.hasErrors('posterPath')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{posterPath}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="genres" class="form-label">Žanrovi</label>
+                    <input type="text" class="form-control" id="genres" name="genres" th:field="*{genres}">
+                    <div th:if="${#fields.hasErrors('genres')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{genres}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="productionCompanies" class="form-label">Produkcijske kompanije</label>
+                    <input type="text" class="form-control" id="productionCompanies" name="productionCompanies" th:field="*{productionCompanies}">
+                    <div th:if="${#fields.hasErrors('productionCompanies')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{productionCompanies}"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <label for="productionCountries" class="form-label">Status</label>
+                    <input type="text" class="form-control" id="productionCountries" name="productionCountries" th:field="*{productionCountries}" required>
+                    <div th:if="${#fields.hasErrors('productionCountries')}" class="alert alert-danger" role="alert">
+                        <span th:errors="*{productionCountries}"></span>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary my-3" style="width: 100%;">Dodaj film</button>
+        </form>
+    </div>
+</div><br>
+
+</div>
+
+<footer class="container-fluid text-center mt-2 bg-light">
+    <p>© 2024 FPMOZ, Mateo Žulj</p>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
