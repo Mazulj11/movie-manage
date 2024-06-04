@@ -21,10 +21,10 @@ services:
     networks:
       - rest-network
     environment:
-      - MSSQL_ROOT_USER=root
-      - MYSQL_ROOT_PASSWORD=lozinka123
+      - MYSQL_ROOT_PASSWORD=rootpass
       - MYSQL_DATABASE=movie_manage_db
-      - MYSQL_DEFAULT_AUTHENTICATION_PLUGIN=mysql_native_password
+      - MYSQL_USER=restouser
+      - MYSQL_PASSWORD=lozinka
     volumes:
       - mysql-data:/var/lib/mysql
       - ./initdb:/docker-entrypoint-initdb.d
@@ -33,7 +33,6 @@ services:
 networks:
   rest-network:
     driver: bridge
-
 volumes:
   mysql-data:
   java-data:
