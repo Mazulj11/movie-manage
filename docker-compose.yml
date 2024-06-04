@@ -16,7 +16,7 @@ services:
 
   mysql:
     container_name: mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --default-authentication-plugin=mysql_native_password
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --mysql-native-password=ON
     image: mysql:latest
     networks:
       - rest-network
@@ -27,6 +27,7 @@ services:
       - MYSQL_PASSWORD=lozinka
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
       - ./initdb:/docker-entrypoint-initdb.d
     restart: always
 
