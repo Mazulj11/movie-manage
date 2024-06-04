@@ -7,11 +7,9 @@ services:
     environment:
       - MYSQL_HOST=mysql
     ports:
-      - 80:8080
+      - "80:8080"
     networks:
       - rest-network
-    volumes:
-      - java-data:/app/uploads
     depends_on:
       - mysql
     restart: always
@@ -19,14 +17,12 @@ services:
   mysql:
     container_name: mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --default-authentication-plugin=mysql_native_password
-    image: mysql
+    image: mysql:latest
     networks:
       - rest-network
     environment:
       - MYSQL_ROOT_PASSWORD=lozinka123
       - MYSQL_DATABASE=movie_manage_db
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=lozinka123
     volumes:
       - mysql-data:/var/lib/mysql
       - ./initdb:/docker-entrypoint-initdb.d
