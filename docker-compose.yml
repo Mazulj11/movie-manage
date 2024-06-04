@@ -21,6 +21,7 @@ services:
     networks:
       - rest-network
     environment:
+      - MSQL_ROOT_USER=root
       - MYSQL_ROOT_PASSWORD=lozinka123
       - MYSQL_DATABASE=movie_manage_db
     volumes:
