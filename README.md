@@ -38,7 +38,7 @@ Za izgradnju i pokretanje aplikacije, slijedite ove korake:
 
    `docker-compose down`
 
-###Inicijalizacija Baze Podataka
+### Inicijalizacija Baze Podataka
 Direktorij initdb sadrži SQL skripte koje inicijaliziraju bazu podataka. Ove skripte se automatski pokreću kada se MySQL kontejner pokrene prvi put.
 
 ### Funkcionalnosti Aplikacije
